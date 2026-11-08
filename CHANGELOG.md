@@ -2,6 +2,21 @@
 
 本包遵循 [Semantic Versioning](https://semver.org/lang/zh-CN/)。
 
+## 1.0.1 — 2026-11-08
+
+### `install.ps1`
+
+- `-Tgz` 现在也接受 `http(s)://` 地址，装插件不必先手动下载。
+- 传 URL 时优先让 pnpm 自己下载，依赖里记的是 URL，之后 `pnpm install` 仍可重新拉取；
+  若 pnpm 的原生网络栈被系统拒绝（`os error 10013`），自动回退到 `curl.exe` 下载到
+  `<profile>\.dsh-tool-camera\` 再本地安装。
+- 修好 `-Tgz` 相对路径从非仓库目录调用时的解析，以及脚本被外部工具重写后丢失 UTF-8 BOM
+  导致 PowerShell 5.1 按 ANSI 解析中文的问题。
+
+### 元数据
+
+- 作者与版权行改为项目署名，不再指向个人。
+
 ## 1.0.0 — 2026-11-08
 
 首个公开版本。

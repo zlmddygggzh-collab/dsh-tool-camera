@@ -110,25 +110,57 @@ foreach ($file in @('package.json', 'pnpm-lock.yaml')) {
 
 # ---------- 4. pnpm add -----------------------------------------------------
 if ($PSCmdlet.ParameterSetName -eq 'Tgz') {
-    if (-not (Test-Path $Tgz)) { throw "安装包不存在：$Tgz" }
-    $spec = (Resolve-Path $Tgz).Path
+    # A URL is handed to pnpm untouched: pnpm writes the URL into dependencies,
+    # so a later `pnpm install` can refetch it, whereas downloading first would
+    # leave a temp path that stops resolving as soon as %TEMP% is cleaned.
+    if ($Tgz -match '^(https?)://') {
+        $spec = $Tgz
+    } else {
+        if (-not (Test-Path $Tgz)) { throw "安装包不存在：$Tgz" }
+        $spec = (Resolve-Path $Tgz).Path
+    }
 } else {
     $spec = $FromNpm
 }
 
 Write-Step "安装 $spec"
+
+function Invoke-PnpmAdd([string]$Target) {
+    $argv = @()
+    if ($pnpmInfo.Prefix.Count -gt 0) { $argv = @($pnpmInfo.Prefix) }
+    $argv += @('add', $Target)
+    & $pnpmInfo.File @argv | Out-Host
+    return $LASTEXITCODE
+}
+
 Push-Location $Profile
 try {
-    $arguments = @()
-    if ($pnpmInfo.Prefix.Count -gt 0 -and $pnpmInfo.File -eq 'node') {
-        $arguments = $pnpmInfo.Prefix + @('add', $spec)
-    } elseif ($pnpmInfo.Prefix.Count -gt 0) {
-        $arguments = $pnpmInfo.Prefix + @('add', $spec)
-    } else {
-        $arguments = @('add', $spec)
+    $code = Invoke-PnpmAdd $spec
+    # pnpm 12 reports the tarball fetch through its own network stack, which on
+    # some Windows hosts is refused at the socket layer (os error 10013) even
+    # though curl.exe succeeds. Keep the direct attempt first — it records the
+    # URL, which survives a later `pnpm install` — and fall back to a plain
+    # download followed by a local-file install.
+    if ($code -ne 0 -and $spec -match '^(https?)://') {
+        Write-Host "    pnpm 直接下载失败（exit $code），改用本地 tarball 重试" -ForegroundColor Yellow
+        $dir = Join-Path $Profile '.dsh-tool-camera'
+        New-Item -ItemType Directory -Path $dir -Force | Out-Null
+        $leaf = Split-Path -Leaf ($spec -split '\?' | Select-Object -First 1)
+        if (-not $leaf) { $leaf = 'dsh-tool-camera.tgz' }
+        $local = Join-Path $dir $leaf
+        $curl = Get-Command curl.exe -ErrorAction SilentlyContinue
+        if ($curl) {
+            & $curl.Source -sS -L --max-time 180 -o $local $spec
+            if ($LASTEXITCODE -ne 0) { throw "下载失败（curl exit $LASTEXITCODE）：$spec" }
+        } else {
+            [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+            Invoke-WebRequest -Uri $spec -OutFile $local -UseBasicParsing
+        }
+        Write-Ok "已下载到 $local（$([math]::Round((Get-Item $local).Length / 1KB, 1)) KB）"
+        $spec = $local
+        $code = Invoke-PnpmAdd $spec
     }
-    & $pnpmInfo.File @arguments
-    if ($LASTEXITCODE -ne 0) { throw "pnpm add 失败（exit $LASTEXITCODE）" }
+    if ($code -ne 0) { throw "pnpm add 失败（exit $code）" }
 } finally {
     Pop-Location
 }

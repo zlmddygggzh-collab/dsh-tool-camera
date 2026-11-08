@@ -31,13 +31,25 @@
 
 ### 方式一：一键脚本（推荐）
 
+连包都不用先下载，直接把 Release 地址喂给它：
+
 ```powershell
-pwsh -File install.ps1 -Tgz .\dsh-tool-camera-1.0.0.tgz
+pwsh -File install.ps1 -Tgz "https://github.com/zlmddygggzh-collab/dsh-tool-camera/releases/download/v1.0.1/dsh-tool-camera-1.0.1.tgz"
+```
+
+或者本地已有 tarball：
+
+```powershell
+pwsh -File install.ps1 -Tgz .\dsh-tool-camera-1.0.1.tgz
 ```
 
 脚本会自己找 profile 目录、找 pnpm（PATH → corepack → DSH 自带 → npx 兜底），
 备份 `package.json` 与 `pnpm-lock.yaml`，然后做两件事：`pnpm add` + 把包名登记进
 `dsh.profile.bundles`。改错了就把 `*.bak-camera-<时间戳>` 改回原名。
+
+传 URL 时脚本先让 pnpm 自己下载（这样依赖里记的是 URL，以后 `pnpm install` 还能重新拉）；
+个别 Windows 机器上 pnpm 的原生网络栈会以 `os error 10013` 被拦，脚本会自动改用
+`curl.exe` 下载到 `<profile>\.dsh-tool-camera\` 再本地安装。
 
 ### 方式二：手动两步
 

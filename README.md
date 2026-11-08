@@ -32,14 +32,27 @@ The package is 16 KB (ffmpeg is not bundled). **Restart DSH** afterwards — the
 
 ### Option 1: one-shot script (recommended on Windows)
 
+No download step needed — hand it the release URL:
+
 ```powershell
-pwsh -File install.ps1 -Tgz .\dsh-tool-camera-1.0.0.tgz
+pwsh -File install.ps1 -Tgz "https://github.com/zlmddygggzh-collab/dsh-tool-camera/releases/download/v1.0.1/dsh-tool-camera-1.0.1.tgz"
+```
+
+or point it at a tarball you already have:
+
+```powershell
+pwsh -File install.ps1 -Tgz .\dsh-tool-camera-1.0.1.tgz
 ```
 
 The script finds your profile directory, finds pnpm (PATH → corepack → the pnpm shipped with
 DSH → npx fallback), backs up `package.json` and `pnpm-lock.yaml`, then does both steps:
 `pnpm add` and registering the package in `dsh.profile.bundles`.
 To roll back, rename the generated `*.bak-camera-<stamp>` files.
+
+With a URL it first lets pnpm fetch the tarball (so the recorded dependency stays a URL and a
+later `pnpm install` can refetch it). On hosts where pnpm's native network stack is refused at
+the socket layer (`os error 10013`), the script falls back to downloading with `curl.exe` into
+`<profile>\.dsh-tool-camera\` and installing from that local file.
 
 ### Option 2: two manual steps
 
