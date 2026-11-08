@@ -1,0 +1,69 @@
+{
+  "name": "dsh-tool-camera",
+  "version": "1.0.0",
+  "description": "给 DeepSeek Harness 一双眼睛：agent 直接抓本机摄像头的一帧实时画面，不需要打开相机应用，也不需要窗口在前台。",
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "deepseek-harness",
+    "cordis",
+    "camera",
+    "webcam",
+    "vision",
+    "multimodal",
+    "screenshot",
+    "ffmpeg"
+  ],
+  "license": "MIT",
+  "author": "dsh-tool-camera contributors",
+  "type": "module",
+  "main": "./lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib",
+    "cordis.patch.yml",
+    "install.ps1",
+    "README.md",
+    "README.zh.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "check": "node --check lib/index.js && node --check lib/targz.js && node --check lib/ffmpeg-bootstrap.js",
+    "smoke": "node scripts/smoke.mjs"
+  },
+  "os": [
+    "win32",
+    "darwin",
+    "linux"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "compatibility": {
+      "dshReleases": {
+        "0.2.1-rc.3": "compatible",
+        "0.2.2-alpha.2": "compatible",
+        "0.2.2-rc.1": "compatible"
+      }
+    }
+  },
+  "peerDependencies": {
+    "@deepseek-ai/dsh-tools": ">=0.2.0-rc.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zlmddygggzh-collab/dsh-tool-camera.git"
+  },
+  "bugs": {
+    "url": "https://github.com/zlmddygggzh-collab/dsh-tool-camera/issues"
+  },
+  "homepage": "https://github.com/zlmddygggzh-collab/dsh-tool-camera#readme"
+}

@@ -1,0 +1,33 @@
+# dsh-tool-camera — bundle patch layer
+#
+# 这是一个 CARRIER bundle：包本身只注册两个工具（camera_snapshot /
+# camera_devices），装载时把一行 loader row 插进 profile 的层栈。
+#
+# BOOT SAFETY — 这一行故意不写 disabled，理由如下：
+#   本插件在 apply() 阶段不碰网络、不碰摄像头、也不解析 ffmpeg。ffmpeg 的
+#   定位与下载都推迟到第一次真正抓帧时（camera_snapshot / camera_devices），
+#   所以冷启动最多花几毫秒注册两个工具定义，不可能像「启动时拉依赖」那样
+#   把窗口卡在 Loading plugins…。
+#
+# 想改设备或超时，不用动这个文件——在 profile 自己的 patch 层覆盖即可：
+#
+#   - id: tool-camera
+#     config:
+#       device: ov9734_azurewave_camera
+#       frames: 8
+#
+- insert:
+    - id: tool-camera
+      name: dsh-tool-camera
+      config:
+        # 单次抓帧的 ffmpeg 超时。摄像头起流慢（尤其外接 USB）时可以调大。
+        timeoutMs: 20000
+        # 抓几帧只留最后一帧：避开刚打开时的黑屏/自动曝光未收敛。
+        frames: 5
+        # JPEG 质量 1-31，数字越小画质越好、体积越大。
+        quality: 3
+        # 首次使用时允许自动下载对应平台的 ffmpeg 到 $DSH_HOME/tools/。
+        # 内网/离线环境改成 false，然后手动放置 ffmpeg 或用 ffmpegPath 指定。
+        autoDownload: true
+        # 想固定某个摄像头就填设备名（先用 camera_devices 查看）。
+        device: ""
