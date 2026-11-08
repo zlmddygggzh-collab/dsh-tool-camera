@@ -79,7 +79,7 @@ Then append the package name to the `dsh.profile.bundles` array in the same `pac
 **Do not skip this.** `bundles` decides which packages are loaded into the layer stack;
 a dependency that is not listed there never gets mounted.
 
-### Option 3: after publishing to npm
+### Option 3: from npm (already published)
 
 ```bash
 pnpm add dsh-tool-camera

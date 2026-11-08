@@ -2,6 +2,11 @@
 
 本包遵循 [Semantic Versioning](https://semver.org/lang/zh-CN/)。
 
+## 1.0.2 — 2026-11-08
+
+### 发布
+
+- 已发布到 npm，README 的「方式三」由「发布到 npm 之后」改为「从 npm 直接装（已发布）」。
 ## 1.0.1 — 2026-11-08
 
 ### `install.ps1`

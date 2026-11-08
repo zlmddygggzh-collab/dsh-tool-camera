@@ -75,7 +75,7 @@ pnpm add /path/to/dsh-tool-camera-1.0.0.tgz
 
 **这一步不能省**：`bundles` 决定层栈里加载哪些包，只在 `dependencies` 里装好不会生效。
 
-### 方式三：发布到 npm 之后
+### 方式三：从 npm 直接装（已发布）
 
 ```bash
 pnpm add dsh-tool-camera

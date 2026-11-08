@@ -1,6 +1,6 @@
 {
   "name": "dsh-tool-camera",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "给 DeepSeek Harness 一双眼睛：agent 直接抓本机摄像头的一帧实时画面，不需要打开相机应用，也不需要窗口在前台。",
   "keywords": [
     "dsh",
