@@ -2,6 +2,23 @@
 
 本包遵循 [Semantic Versioning](https://semver.org/lang/zh-CN/)。
 
+## 1.0.3 — 2026-11-09
+
+### 弱光也能拍清楚
+
+之前摄像头在暗光房间里抓回来的基本是全黑，只能看清亮着的那盏灯。现在 `camera_snapshot`
+多了一组后期参数，抓帧时直接交给 ffmpeg 的滤镜链处理，不用另外再开个软件拉曲线：
+
+- 新增工具参数与同名配置：`brightness`（−1~1）、`gamma`（0.1~10）、`contrast`（0~3）、
+  `sharpen`（0~2）、`autoLevel`（布尔）。
+- `autoLevel` 走 `normalize=blackpt=black:whitept=white`，把画面拉伸到全动态范围，
+  不知道环境有多暗时一把梭；和手动参数可以叠加（`normalize` 在前，`eq` 在后，`unsharp` 最后）。
+- 默认值全部保持「不改动画面」（`0 / 1 / 1 / 0 / false`），所以正常光线下拍出来的结果
+  和 1.0.2 完全一致，不会因为升级就过曝。
+- 参数逐项做了范围钳制，传超范围的值不会让 ffmpeg 直接失败。
+- README 中英文的参数表与配置表同步补齐，并给出弱光推荐值（`gamma 1.4~1.8`、
+  `brightness 0.2~0.35`、`contrast 1.2~1.4`、`sharpen 0.6~1.0`）。
+
 ## 1.0.2 — 2026-11-08
 
 ### 发布

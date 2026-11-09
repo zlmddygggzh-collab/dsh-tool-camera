@@ -112,6 +112,17 @@ Take a snapshot with camera_snapshot, 8 frames
 | `device` | first available | Device name (see `camera_devices`) |
 | `frames` | 5 | Frames captured, keep the last. Early frames are often black or over-exposed |
 | `quality` | 3 | JPEG quality 1–31, lower is better |
+| `brightness` | 0 | −1 to 1 |
+| `gamma` | 1 | 0.1 to 10 |
+| `contrast` | 1 | 0 to 3 |
+| `sharpen` | 0 | 0 to 2 |
+| `autoLevel` | false | Stretch the frame to full dynamic range (`normalize`) |
+
+A dim room used to come back as a black rectangle. Now:
+
+```
+Take a snapshot with camera_snapshot, autoLevel on, gamma 1.6
+```
 
 ---
 
@@ -148,6 +159,7 @@ Override the same row in your profile's `cordis.patch.yml` (no need to touch fil
     quality: 2
     timeoutMs: 30000
     autoDownload: true
+    gamma: 1.5                         # lift the shadows by default
 ```
 
 | Key | Default | Description |
@@ -156,8 +168,15 @@ Override the same row in your profile's `cordis.patch.yml` (no need to touch fil
 | `device` | `''` | Pin a device; empty means first available |
 | `frames` | `5` | Frames captured, max 30 |
 | `quality` | `3` | JPEG quality 1–31 |
+| `brightness` | `0` | −1 to 1; `0.2–0.35` for a dim room |
+| `gamma` | `1` | 0.1 to 10; `1.4–1.8` lifts shadows without blowing highlights |
+| `contrast` | `1` | 0 to 3; `1.2–1.4` if the lifted frame looks flat |
+| `sharpen` | `0` | 0 to 2; `0.6–1.0` to recover edges lost to noise |
+| `autoLevel` | `false` | Stretch to full dynamic range (`normalize`) |
 | `timeoutMs` | `20000` | Per-capture timeout |
 | `autoDownload` | `true` | Fetch ffmpeg when missing |
+
+Tool arguments win over configuration, so both paths lead to the same ffmpeg filter chain.
 
 ---
 

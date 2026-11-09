@@ -112,6 +112,17 @@ pnpm remove dsh-tool-camera
 | `device` | 自动选第一个 | 设备名（用 `camera_devices` 查） |
 | `frames` | 5 | 抓几帧只留最后一帧。摄像头刚开时前几帧常是全黑/过曝 |
 | `quality` | 3 | JPEG 质量 1–31，越小越好 |
+| `brightness` | 0 | 亮度 −1~1 |
+| `gamma` | 1 | 伽马 0.1~10 |
+| `contrast` | 1 | 对比度 0~3 |
+| `sharpen` | 0 | 锐化 0~2 |
+| `autoLevel` | false | 自动拉伸亮度（`normalize`） |
+
+房间太暗、拍出来一片黑的时候，加这几个参数就行：
+
+```
+用 camera_snapshot 拍一张，autoLevel 开上，gamma 1.6
+```
 
 ---
 
@@ -147,6 +158,7 @@ pnpm remove dsh-tool-camera
     quality: 2                         # 画质更好
     timeoutMs: 30000                   # 外接 USB 摄像头起流慢
     autoDownload: true                 # 允许自动装 ffmpeg
+    gamma: 1.5                         # 环境偏暗时默认提一提暗部
 ```
 
 | 键 | 默认 | 说明 |
@@ -155,8 +167,17 @@ pnpm remove dsh-tool-camera
 | `device` | `''` | 固定设备；留空则自动选第一个 |
 | `frames` | `5` | 抓帧数，上限 30 |
 | `quality` | `3` | JPEG 质量 1–31 |
+| `brightness` | `0` | 亮度 −1~1。弱光填 `0.2~0.35` |
+| `gamma` | `1` | 伽马 0.1~10。弱光填 `1.4~1.8`，比单纯拉亮度更不容易过曝 |
+| `contrast` | `1` | 对比度 0~3。提亮后画面发灰就填 `1.2~1.4` |
+| `sharpen` | `0` | 锐化 0~2。提亮后噪点糊成一片时填 `0.6~1.0` |
+| `autoLevel` | `false` | 自动把亮度拉伸到全动态范围（`normalize` 滤镜） |
 | `timeoutMs` | `20000` | 单次抓帧超时 |
 | `autoDownload` | `true` | 缺 ffmpeg 时自动下载 |
+
+上面四个后期参数（`brightness` / `gamma` / `contrast` / `sharpen`）也可以每次调用时临时传，
+`camera_snapshot` 的参数优先于配置。弱光环境一句 `autoLevel: true` 就能先看个大概，
+不够再叠加 `gamma`。
 
 ---
 
